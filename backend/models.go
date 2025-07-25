@@ -71,12 +71,12 @@ func (URL) TableName() string {
 
 // UserURLRelation represents the relationship between a user and a URL
 type UserURLRelation struct {
-	URL         URL       `json:"url" gorm:"foreignKey:URLID"`
 	CreatedAt   time.Time `json:"-" gorm:"column:created_at"`
 	UpdatedAt   time.Time `json:"-" gorm:"column:updated_at"`
 	CustomTitle *string   `json:"custom_title" gorm:"column:custom_title"`
 	UserUUID    string    `json:"user_uuid" gorm:"column:user_uuid;index"`
 	Status      string    `json:"-" gorm:"column:status;default:active"`
+	URL         URL       `json:"url" gorm:"foreignKey:URLID"`
 	ID          uint64    `json:"id" gorm:"primaryKey;column:id;autoIncrement"`
 	URLID       uint64    `json:"url_id" gorm:"column:url_id"`
 }
@@ -87,7 +87,7 @@ func (UserURLRelation) TableName() string {
 }
 
 // GetTitle returns the display title, using custom title if available
-func (r UserURLRelation) GetTitle() string {
+func (r *UserURLRelation) GetTitle() string {
 	if r.CustomTitle != nil && *r.CustomTitle != "" {
 		return *r.CustomTitle
 	}
@@ -95,7 +95,7 @@ func (r UserURLRelation) GetTitle() string {
 }
 
 // ToIframeItem converts UserURLRelation to IframeItem
-func (r UserURLRelation) ToIframeItem() IframeItem {
+func (r *UserURLRelation) ToIframeItem() IframeItem {
 	return IframeItem{
 		Title: r.GetTitle(),
 		URL:   r.URL.URL,
@@ -108,16 +108,16 @@ type IframeItem struct {
 	URL   string `json:"url"`
 }
 
-// ApiResponse represents the API response format
-type ApiResponse struct {
+// APIResponse represents the API response format
+type APIResponse struct {
 	Message string       `json:"message,omitempty"`
 	Data    []IframeItem `json:"data"`
 	Success bool         `json:"success"`
 }
 
 // NewSuccessResponse creates a successful API response
-func NewSuccessResponse(data []IframeItem) ApiResponse {
-	return ApiResponse{
+func NewSuccessResponse(data []IframeItem) APIResponse {
+	return APIResponse{
 		Success: true,
 		Data:    data,
 		Message: "Success",
@@ -125,8 +125,8 @@ func NewSuccessResponse(data []IframeItem) ApiResponse {
 }
 
 // NewErrorResponse creates an error API response
-func NewErrorResponse(message string) ApiResponse {
-	return ApiResponse{
+func NewErrorResponse(message string) APIResponse {
+	return APIResponse{
 		Success: false,
 		Data:    []IframeItem{},
 		Message: message,

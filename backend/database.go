@@ -70,8 +70,8 @@ func (d *Database) GetIframesByUserUUID(userUUID string) ([]IframeItem, error) {
 
 	// Convert using method - more functional approach
 	iframes := make([]IframeItem, 0, len(relations))
-	for _, relation := range relations {
-		iframes = append(iframes, relation.ToIframeItem())
+	for i := range relations {
+		iframes = append(iframes, relations[i].ToIframeItem())
 	}
 
 	return iframes, nil

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -85,7 +86,7 @@ func (app *App) authMiddleware() gin.HandlerFunc {
 func extractUserUUID(tokenString string) (string, error) {
 	token, _, err := new(jwt.Parser).ParseUnverified(tokenString, jwt.MapClaims{})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to parse JWT token: %w", err)
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
@@ -118,6 +119,7 @@ func (app *App) getIframes(c *gin.Context) {
 		log.Printf("Fetching iframes for user UUID: %s", userUUID)
 	}
 
+	// nolint:errcheck // error is properly handled in the next line
 	iframes, err := app.database.GetIframesByUserUUID(userUUID.(string))
 	if err != nil {
 		log.Printf("Error fetching iframes for user %s: %v", userUUID, err)
